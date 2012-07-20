@@ -33,6 +33,10 @@
   float: left;
 }
 
-div#index_top div.per_page_links {
-  float: right;
+div.paginated_collection {
+  div#index_top {
+    div.per_page_links {
+      float: right;
+    }
+  }
 }
