@@ -1,3 +1,5 @@
+require 'active_admin/helpers/collection'
+
 module ActiveAdmin
   module Views
     module Pages
@@ -35,15 +37,10 @@ module ActiveAdmin
           end
         end
 
+        include ::ActiveAdmin::Helpers::Collection
+
         def items_in_collection?
-          # Remove the order clause before limiting to 1. This ensures that
-          # any referenced columns in the order will not try to be accessed.
-          #
-          # When we call #exists?, the query's select statement is changed to "1".
-          #
-          # If we don't reorder, there may be some columns referenced in the order
-          # clause that requires the original select.
-          !collection.empty? && collection.reorder("").limit(1).exists?
+          !collection_is_empty?
         end
 
         def build_collection
@@ -114,7 +111,7 @@ module ActiveAdmin
             raise ArgumentError, "'as' requires a class or a symbol"
           end
         end
-        
+
         def render_blank_slate
           blank_slate_content = I18n.t("active_admin.blank_slate.content", :resource_name => active_admin_config.plural_resource_label)
           if controller.action_methods.include?('new')
@@ -122,17 +119,17 @@ module ActiveAdmin
           end
           insert_tag(view_factory.blank_slate, blank_slate_content)
         end
-        
+
         def render_empty_results
           empty_results_content = I18n.t("active_admin.pagination.empty", :model => active_admin_config.plural_resource_label)
           insert_tag(view_factory.blank_slate, empty_results_content)
         end
-        
+
         def render_index
           renderer_class = find_index_renderer_class(config[:as])
           paginator      = config[:paginator].nil?      ? true : config[:paginator]
           download_links = config[:download_links].nil? ? true : config[:download_links]
-          
+
           paginated_collection(collection, :entry_name     => active_admin_config.resource_label,
                                            :entries_name   => active_admin_config.plural_resource_label,
                                            :download_links => download_links,
